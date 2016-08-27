@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<style type="text/css">
+@charset "utf-8";
+/* CSS Document */
+.clearfix:after {content: ".";display: block;clear: both;visibility: hidden;line-height: 0;height: 0;}
+.clearfix {display: inline-block;}
+html[xmlns] .clearfix {display: block;}
+* html .clearfix {height: 1%;}
+* {margin:0;padding:0;box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-font-smoothing:antialiased;-o-font-smoothing:antialiased;font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+#content {width:960px;margin:50px auto;box-shadow:0 0 5px rgba(0, 0, 0, 0.3);}
+.photo {margin: 21px;}
+.black_overlay{
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index:1001;
+	-moz-opacity: 0.8;
+	opacity:.80;
+	filter: alpha(opacity=80);
+}
+.white_content {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	height: 50%;
+	padding: 16px;
+	border: 5px solid gray;
+	background-color: white;
+	z-index:1002;
+	overflow: auto;
+	text-align: center;
+}
+img#current_image {
+	height: 350px;
+	margin: 20px;
+}
+img.photo:hover {
+	cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <a href="#"><img src="slack_logo_wide.png" width="279" height="110" /></a>
+    </div>
+</header>
+
+<div id="content"></div>
+
+<div id="light" class="white_content">
+	<a href="javascript:void(0)" onclick="hide_popup();" style="float: right;">Close</a>
+	<img src="" id="current_image">
+</div>
+<div id="fade" class="black_overlay"></div>
+
+<script type="text/javascript">
+var photo_set_id = "72157655370654096"
+var photos = "https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=20b1932881fb83490710088848d64144&photoset_id="
+	+ photo_set_id 
+	+ "&format=json&privacy_filter=1&per_page=5&jsoncallback=parse_photos&extras=url_sq,url_t,url_s,url_m,url_o,url_q";
+
+// When its document ready  takes photos from Flickr
+document.addEventListener("DOMContentLoaded", function(event) { 
+	get_photos_via_jsonp()
+});
+
+// API call for Flickr
+function get_photos_via_jsonp() {
+	var script = document.createElement("script");
+	script.src = photos;
+	document.body.appendChild(script);
+}
+
+// shows the pics from Flickr
+function parse_photos(data) {
+	var content = document.getElementById("content");
+	for (i in data.photoset.photo) {
+		
+		var element = document.createElement("img");
+		
+		element.src = data.photoset.photo[i].url_q;
+		element.className = "photo";
+		element.setAttribute("data-title", data.photoset.photo[i].title);
+		element.setAttribute("data-large", data.photoset.photo[i].url_m);
+
+		element.onclick = function(event) {
+			var target = event.target || event.srcElement;
+			show_popup(target.getAttribute("data-large"));
+		};
+
+		content.appendChild(element);
+	}
+}
+
+
+// opening lightbox
+function show_popup(url) {
+	var element = document.getElementById("current_image");
+	element.src = url;
+
+	document.getElementById("light").style.display = "block";
+	document.getElementById("fade").style.display  = "block";
+}
+
+// closing lightbox
+function hide_popup() {
+	document.getElementById("light").style.display = "none";
+	document.getElementById("fade").style.display  = "none";
+}
+</script>
+
+    
+</body>
+</html>
